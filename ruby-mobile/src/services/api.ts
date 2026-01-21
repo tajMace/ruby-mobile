@@ -55,9 +55,16 @@ export const ticketAPI = {
     getParentTicket: (id: number) => api.get(`/ticket/${id}/parent`),
 
     // Filters
-  findByStatus: (status: string) => api.get(`/tickets/status/${status}`),
-  findByPriority: (priority: number) => api.get(`/tickets/priority/${priority}`),
-  findByDate: (date: string) => api.get(`/tickets/date/${date}`),
-  findUpcoming: (days?: number) => api.get('/tickets/upcoming', { params: { days } }),
+    findByStatus: (status: string) => api.get(`/tickets/status/${status}`),
+    findByPriority: (priority: number) => api.get(`/tickets/priority/${priority}`),
+    findByDate: (date: string) => api.get(`/tickets/date/${date}`),
+    findUpcoming: (days?: number) => api.get('/tickets/upcoming', { params: { days } }),
+};
+
+export const quickNoteAPI = {
+    createNote: (request: string) => api.post('/quicknote', { request }),
+    getAllNotes: () => api.get('/quicknote'),
+    deleteNote: (id: number) => api.delete('/quicknote', { data: { id } }),
+    deleteAllNotes: () => api.delete('/quicknote/all'),
 };
 
