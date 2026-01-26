@@ -10,35 +10,36 @@
  * =============<< ********* >>=============
  */
 
-import { useState } from 'react'
-import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native'
+import { View, Text, StyleSheet, Pressable } from 'react-native'
 import DayCell from './DayCell'
 import { CalendarEvent } from '../../models/CalendarEvent'
 import { calendarColors, spacing, typography } from '../../theme/index'
-import { getDaysInMonthGrid, getEventsByDate, groupEventsByDate } from '../../utils/calendarUtils';
+import { getEventsByDate } from '../../utils/calendarUtils';
 
-export default function MonthCard() {
-    const { year, month, prev, toToday, next } = useMonthNavigation();
-    const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+interface MonthCardProps {
+    year: number;
+    month: number;
+    days: Array<{ date: Date; isCurrentMonth: boolean }>;
+    selectedDate: Date | null;
+    onSelectDate: (date: Date) => void;
+    eventsByDate: Map<string, CalendarEvent[]>;
+    onPrev: () => void;
+    onToday: () => void;
+    onNext: () => void;
+}
 
-    const days = getDaysInMonthGrid(year, month);
+export default function MonthCard({
+    year, 
+    month,
+    days,
+    selectedDate,
+    onSelectDate,
+    eventsByDate,
+    onPrev,
+    onToday,
+    onNext
+}: MonthCardProps) {
     const monthName = new Date(year, month, 1).toLocaleString('default', { month: 'long'});
-
-    // Mock events - distributed across random dates
-    const mockEvents: CalendarEvent[] = [
-        { id: 1, event_title: 'Team Meeting', date: new Date(year, month, 5).toISOString().split('T')[0] },
-        { id: 2, event_title: 'Project Review', date: new Date(year, month, 5).toISOString().split('T')[0] },
-        { id: 3, event_title: 'Client Call', date: new Date(year, month, 12).toISOString().split('T')[0] },
-        { id: 4, event_title: 'Lunch Meeting', date: new Date(year, month, 12).toISOString().split('T')[0] },
-        { id: 5, event_title: 'Design Review', date: new Date(year, month, 12).toISOString().split('T')[0] },
-        { id: 9, event_title: 'Steve Meeting', date: new Date(year, month, 12).toISOString().split('T')[0] },
-        { id: 6, event_title: 'Sprint Planning', date: new Date(year, month, 18).toISOString().split('T')[0] },
-        { id: 7, event_title: 'Standup', date: new Date(year, month, 18).toISOString().split('T')[0] },
-        { id: 8, event_title: 'Demo', date: new Date(year, month, 25).toISOString().split('T')[0] },
-    ];
-
-    const eventsByDate = groupEventsByDate(mockEvents);
-
     const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
     return (
@@ -62,7 +63,7 @@ export default function MonthCard() {
                             date={dayObj.date}
                             events={getEventsByDate(dayObj.date, eventsByDate)}
                             isCurrentMonth={dayObj.isCurrentMonth}
-                            onPress={() => setSelectedDate(dayObj.date)}
+                            onPress={() => onSelectDate(dayObj.date)}
                             isSelected={selectedDate?.toDateString() === dayObj.date.toDateString()}
                         />
                     </View>
@@ -70,15 +71,15 @@ export default function MonthCard() {
             </View>
 
             <View style={styles.navigationRow}>
-                <Pressable onPress={prev}>
+                <Pressable onPress={onPrev}>
                     <Text style={styles.navButton}>← Prev</Text>
                 </Pressable>
 
-                <Pressable onPress={toToday}>
+                <Pressable onPress={onToday}>
                     <Text style={styles.navButton}>Today</Text>
                 </Pressable>
 
-                <Pressable onPress={next}>
+                <Pressable onPress={onNext}>
                     <Text style={styles.navButton}>Next →</Text>
                 </Pressable>
             </View>
@@ -86,32 +87,8 @@ export default function MonthCard() {
     )
 }
 
-function useMonthNavigation() {
-    const today = new Date()
-    const [year, setYear] = useState(today.getFullYear());
-    const [month, setMonth] = useState(today.getMonth());
-
-    function prev() {
-        setMonth((month === 0) ? 11 : month - 1);
-        if (month === 0) setYear(year - 1);
-    }
-
-    function toToday() {
-        setMonth(today.getMonth());
-        setYear(today.getFullYear())
-    }
-
-    function next() {
-        setMonth((month === 11) ? 0 : month + 1);
-        if (month === 11) setYear(year + 1);
-    }
-
-    return { year, month, prev, toToday, next }
-}
-
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
         backgroundColor: calendarColors.background,
         padding: spacing.md
     },
