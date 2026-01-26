@@ -10,7 +10,7 @@
  * =============<< ********* >>=============
  */
 
-export { colours, type ColourKey } from './colours';
+export { calendarColors, type ColourKey } from './colors';
 export { spacing, type SpacingKey } from './spacing';
 export { typography, type TypographyKey } from './typography';
 

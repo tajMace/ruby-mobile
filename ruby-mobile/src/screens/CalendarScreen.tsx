@@ -11,18 +11,14 @@
  */
 
 import { View, StyleSheet } from 'react-native'
-import { colours, spacing } from '../theme'
-import DayCell from '../components/calendar/DayCell'
+import { calendarColors, spacing } from '../theme'
+import MonthCard from '../components/calendar/MonthView';
 
 export default function CalendarScreen() {
     return (
         <View style={styles.container}>
-            <View style={styles.dayCell}>
-                <DayCell 
-                    date={new Date(2026, 0, 22)}
-                    events={[]}
-                    isCurrentMonth={true}
-                />
+            <View style={styles.monthCard}>
+                <MonthCard />
             </View>
         </View>
     );
@@ -31,13 +27,10 @@ export default function CalendarScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: colours.dark,
-        padding: spacing.md,
-        justifyContent: 'center',
-        alignItems: 'center'
+        backgroundColor: calendarColors.background,
+        paddingVertical: spacing.xxl
     },
-    dayCell: {
-        width: 80,
-        height: 80
+    monthCard: {
+        flex: 1
     }
 });

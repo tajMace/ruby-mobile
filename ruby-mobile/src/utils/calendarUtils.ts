@@ -31,6 +31,10 @@ export function groupEventsByDate(events: CalendarEvent[]): Map<string, Calendar
     return grouped;
 }
 
+export function getEventsByDate(date: Date, events: Map<string, CalendarEvent[]>): CalendarEvent[]{
+    return events.get(date.toISOString().split('T')[0]) || [];
+}
+
 /**
  * generates all days for a month view (including padding from prev/next month)
  * returns array of (date, isCurrentMonth) objects
@@ -62,7 +66,7 @@ export function getDaysInMonthGrid(year: number, month: number): Array<{date: Da
 export function formatDateKey(date: Date): string {
     const year = date.getFullYear();
     const month = String((date.getMonth() + 1)).padStart(2, '0');
-    const day = String(date.getDay()).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
 
     return `${year}-${month}-${day}`;
 }

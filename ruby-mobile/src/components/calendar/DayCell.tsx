@@ -10,58 +10,36 @@
  * =============<< ********* >>=============
  */
 
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, Pressable } from 'react-native'
 import { CalendarEvent } from '../../models/CalendarEvent'
-import { colours, spacing, typography } from '../../theme/index'
+import { calendarColors, spacing, typography } from '../../theme/index'
 import { isToday } from '../../utils/calendarUtils'
 
 interface DayCellProps {
     date: Date;
     events: CalendarEvent[];
     isCurrentMonth: boolean;
+    onPress?: () => void;
+    isSelected?: boolean;
 }
 
-export default function DayCell({ date, events, isCurrentMonth }: DayCellProps) {
-    const today = isToday(date);
+export default function DayCell({ date, events, isCurrentMonth, onPress, isSelected }: DayCellProps) {
     const dayNumber = date.getDate();
-    const maxVisibleDots = 4;
+    const maxVisibleDots = 6;
     const displayEvents = events.slice(0, maxVisibleDots);
     const overflow = Math.max(0, events.length - maxVisibleDots);
 
-    const styles = StyleSheet.create({
-        container: {
-            flex: 1,
-            padding: spacing.sm,
-            aspectRatio: 1,
-            backgroundColor: today ? colours.accent : colours.secondary,
-            borderRadius: 8,
-            opacity: isCurrentMonth ? 1 : 0.5
-        },
-        dayNumber: {
-            ...typography.bodySmall,
-            color: today ? 'white' : colours.dark,
-            fontWeight: today ? '600' : '400',
-            marginBottom: spacing.xs
-        },
-        dotsContainer: {
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            gap: spacing.xs
-        },
-        dot: {
-            width: 6,
-            height: 6,
-            backgroundColor: colours.accent,
-            borderRadius: 1
-        },
-        overflowText: {
-            ...typography.caption,
-            color: colours.dark
-        }
-    });
+    const styles = getStyles(!!isSelected, isCurrentMonth, events.length);
 
     return (
-        <View style={styles.container}>
+        <Pressable 
+            onPress={onPress} 
+            style={({ pressed }) => [
+                styles.container, 
+                isSelected && styles.selected, 
+                pressed && styles.pressed
+            ]}
+        >
             <Text style={styles.dayNumber}>{dayNumber}</Text>
             <View style={styles.dotsContainer}>
                 {displayEvents.map((event) => (
@@ -71,6 +49,58 @@ export default function DayCell({ date, events, isCurrentMonth }: DayCellProps) 
                     <Text style={styles.overflowText}>+{overflow}</Text>
                 )}
             </View>
-        </View>
-    )
+        </Pressable>
+    );
+}
+
+function getStyles(isSelected: boolean, isCurrentMonth: boolean, dotCount: number) {
+    const isSingleRow = dotCount <= 3;
+
+    return StyleSheet.create({
+        container: {
+            flex: 1,
+            padding: spacing.xs,
+            aspectRatio: 1,
+            borderWidth: 2,
+            borderRadius: 6,
+            borderColor: isSelected ? calendarColors.todayBorder : calendarColors.border,
+            opacity: isCurrentMonth ? 1 : 0.5,
+            justifyContent: 'flex-start',
+            flexDirection: 'column',
+            alignItems: 'center',
+        },
+        dayNumber: {
+            ...typography.button,
+            color: calendarColors.dayNumber,
+            fontWeight: isSelected ? '600' : '400',
+            marginBottom: 0
+        },
+        dotsContainer: {
+            width: '70%',
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            gap: spacing.xs,
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginTop: (isSingleRow) ? 'auto' : 0,
+            marginBottom: (isSingleRow) ? 'auto' : 0
+        },
+        dot: {
+            width: '20%',
+            aspectRatio: 1,
+            backgroundColor: calendarColors.eventDot,
+            borderRadius: 1
+        },
+        overflowText: {
+            ...typography.caption,
+            color: calendarColors.dayNumber
+        },
+        selected: {
+            borderColor: calendarColors.todayBorder,
+            borderWidth: 3
+        },
+        pressed: {
+            opacity: 0.7
+        }
+    });
 }
