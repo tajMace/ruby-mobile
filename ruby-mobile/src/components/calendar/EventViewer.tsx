@@ -52,10 +52,10 @@ function EventCard({ event }: { event: CalendarEvent }) {
                 )}
 
                 {event.start_time && (
-                    <Text style={styles.eventDate}>{event.start_time}</Text>
+                    <Text style={styles.eventStartTime}>{event.start_time}</Text>
                 )}
                 {event.end_time && (
-                    <Text style={styles.eventLocation}>{event.end_time}</Text>
+                    <Text style={styles.eventEndTime}>{event.end_time}</Text>
                 )}
             </View>
         </View>
@@ -100,9 +100,14 @@ const styles = StyleSheet.create({
         color: calendarColors.dayNumber,
         opacity: 0.7
     },
-    eventDate: {
+    eventStartTime: {
         ...typography.h2,
-        color: calendarColors.todayBorder,
+        color: calendarColors.dayNumber,
+        marginBottom: spacing.xs
+    },
+    eventEndTime: {
+        ...typography.h3,
+        color: calendarColors.dayNumber,
         marginBottom: spacing.xs
     },
     eventLocation: {
