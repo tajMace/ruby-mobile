@@ -13,7 +13,6 @@
 import { View, Text, StyleSheet, ScrollView } from 'react-native'
 import { CalendarEvent } from '../../models/CalendarEvent'
 import { calendarColors, spacing, typography } from '../../theme'
-import { typography } from '../../theme/typography';
 
 interface EventViewerProps {
     date: Date;
@@ -29,7 +28,36 @@ export default function EventViewer({ date, events }: EventViewerProps) {
 }
 
 function EventCard({ event }: { event: CalendarEvent }) {
+    return (
+        <View style={styles.eventCard}>
+            <View style={styles.leftContent}>
+                <Text style={styles.eventTitle}>{event.event_title}</Text>
+                {event.location && (
+                    <Text style={styles.eventLocation}>{event.location}</Text>
+                )}
+                {event.description && (
+                    <Text style={styles.eventDescription}>{event.description}</Text>
+                )}
+            </View>
 
+            <View style={styles.rightContent}>
+                {event.labels && event.labels.length > 0 && (
+                    <View style={styles.tagsContainer}>
+                        {event.labels.map((label, index) => (
+                            <Text key={index} style={styles.eventTag}>{label}</Text>
+                        ))}
+                    </View>
+                )}
+
+                {event.start_time && (
+                    <Text style={styles.eventDate}>{event.start_time}</Text>
+                )}
+                {event.end_time && (
+                    <Text style={styles.eventLocation}>{event.end_time}</Text>
+                )}
+            </View>
+        </View>
+    );
 }
 
 const styles = StyleSheet.create({
@@ -87,7 +115,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: spacing.xs,
         paddingVertical: spacing.xs,
         borderRadius: 4,
-        maginBottom: spacing.xs
-    },
-    
+        marginBottom: spacing.xs
+    }
 });
