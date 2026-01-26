@@ -22,7 +22,9 @@ interface EventViewerProps {
 export default function EventViewer({ date, events }: EventViewerProps) {
     return (
         <ScrollView style={styles.container}>
-
+            {events.map((event) => (
+                <EventCard key={event.id} event={event} />
+            ))}
         </ScrollView>
     );
 }
