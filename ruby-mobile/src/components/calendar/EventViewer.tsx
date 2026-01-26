@@ -108,6 +108,13 @@ const styles = StyleSheet.create({
         color: calendarColors.dayNumber,
         marginBottom: spacing.sm
     },
+    tagsContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: spacing.xs,
+        marginBottom: spacing.sm,
+        justifyContent: 'flex-end'
+    },
     eventTag: {
         ...typography.caption,
         color: calendarColors.dayNumber,
