@@ -21,6 +21,11 @@ import { getDaysInMonthGrid, getEventsByDate, groupEventsByDate } from "../../ut
 export default function MonthViewer() {
     const { year, month, prev, toToday, next } = useMonthNavigation();
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+    const [showCreateEvent, setShowCreateEvent] = useState(false);
+
+    function handleCreateEvent() {
+        setShowCreateEvent(true);
+    }
 
     // Mock events - distributed across random dates
     const mockEvents: CalendarEvent[] = [
@@ -137,6 +142,7 @@ export default function MonthViewer() {
                 <EventViewer
                     date={selectedDate}
                     events={getEventsByDate(selectedDate, eventsByDate)}
+                    onCreateEvent={handleCreateEvent}
                 />
             )}
         </View>

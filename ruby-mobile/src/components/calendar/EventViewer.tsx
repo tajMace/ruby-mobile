@@ -23,14 +23,10 @@ interface EventViewerProps {
 export default function EventViewer({ date, events, onCreateEvent }: EventViewerProps) {
     return (
         <ScrollView style={styles.container}>
-            {events.length === 0 ? (
-                <View style={styles.emptyState}>
-                    <Text style={styles.emptyStateText}>no events.</Text>
-                </View>
-            ) : (events.map((event) => (
-                    <EventCard key={event.id} event={event} />
-                ))
-            )}
+            {events.map((event) => (
+                <EventCard key={event.id} event={event} />
+            ))}
+            <CreateEventButton onPress={onCreateEvent} />
         </ScrollView>
     );
 }
