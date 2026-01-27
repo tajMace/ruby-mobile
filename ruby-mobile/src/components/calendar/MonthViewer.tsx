@@ -10,118 +10,40 @@
  * =============<< ********* >>=============
  */
 
-import { useState } from "react";
-import { View, StyleSheet } from 'react-native'
+import { useState, useEffect } from "react";
+import { View, StyleSheet, Modal } from 'react-native'
 import MonthCard from "./MonthCard";
 import EventViewer from "./EventViewer";
+import CreateEventForm from './CreateEventForm'
 import { CalendarEvent } from "../../models/CalendarEvent";
 import { calendarColors, spacing } from '../../theme/index'
 import { getDaysInMonthGrid, getEventsByDate, groupEventsByDate } from "../../utils/calendarUtils";
+import { calendarAPI } from "../../services/api";
 
 export default function MonthViewer() {
     const { year, month, prev, toToday, next } = useMonthNavigation();
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     const [showCreateEvent, setShowCreateEvent] = useState(false);
+    const [events, setEvents] = useState<CalendarEvent[]>([]);
+
+    useEffect(() => {
+        fetchEvents();
+    }, []);
+
+    const fetchEvents = async () => {
+        try {
+            const response = await calendarAPI.getAllEvents();
+            setEvents(response.data);
+        } catch (error) {
+            console.error('Failed to fetch events:', error);
+        }
+    }
 
     function handleCreateEvent() {
         setShowCreateEvent(true);
     }
 
-    // Mock events - distributed across random dates
-    const mockEvents: CalendarEvent[] = [
-        { 
-            id: 1, 
-            event_title: 'Team Meeting', 
-            date: new Date(year, month, 5).toISOString().split('T')[0],
-            start_time: '10:00 AM',
-            end_time: '11:00 AM',
-            location: 'Conference Room A',
-            description: 'Weekly sync with the team',
-            labels: ['work', 'meeting']
-        },
-        { 
-            id: 2, 
-            event_title: 'Project Review', 
-            date: new Date(year, month, 5).toISOString().split('T')[0],
-            start_time: '2:00 PM',
-            end_time: '3:30 PM',
-            location: 'Virtual - Zoom',
-            description: 'Q1 project status review',
-            labels: ['work']
-        },
-        { 
-            id: 3, 
-            event_title: 'Client Call', 
-            date: new Date(year, month, 12).toISOString().split('T')[0],
-            start_time: '9:00 AM',
-            end_time: '10:00 AM',
-            location: 'Office',
-            description: 'Discuss project requirements',
-            labels: ['client', 'important']
-        },
-        { 
-            id: 4, 
-            event_title: 'Lunch Meeting', 
-            date: new Date(year, month, 12).toISOString().split('T')[0],
-            start_time: '12:00 PM',
-            end_time: '1:00 PM',
-            location: 'Downtown Cafe',
-            description: 'Casual team lunch',
-            labels: ['team', 'social']
-        },
-        { 
-            id: 5, 
-            event_title: 'Design Review', 
-            date: new Date(year, month, 12).toISOString().split('T')[0],
-            start_time: '3:00 PM',
-            end_time: '4:00 PM',
-            location: 'Design Studio',
-            description: 'Review new UI mockups',
-            labels: ['design', 'review']
-        },
-        { 
-            id: 9, 
-            event_title: 'Steve Meeting', 
-            date: new Date(year, month, 12).toISOString().split('T')[0],
-            start_time: '4:30 PM',
-            end_time: '5:30 PM',
-            location: 'Office - Room 201',
-            description: 'One-on-one sync',
-            labels: ['1:1', 'management']
-        },
-        { 
-            id: 6, 
-            event_title: 'Sprint Planning', 
-            date: new Date(year, month, 18).toISOString().split('T')[0],
-            start_time: '10:00 AM',
-            end_time: '12:00 PM',
-            location: 'Conference Room B',
-            description: 'Plan sprint tasks and deliverables',
-            labels: ['agile', 'planning']
-        },
-        { 
-            id: 7, 
-            event_title: 'Standup', 
-            date: new Date(year, month, 18).toISOString().split('T')[0],
-            start_time: '9:15 AM',
-            end_time: '9:30 AM',
-            location: 'Virtual',
-            description: 'Daily standup sync',
-            labels: ['daily', 'agile']
-        },
-        { 
-            id: 8, 
-            event_title: 'Demo', 
-            date: new Date(year, month, 25).toISOString().split('T')[0],
-            start_time: '11:00 AM',
-            end_time: '12:00 PM',
-            location: 'Main Hall',
-            description: 'Demo new features to stakeholders',
-            labels: ['demo', 'release']
-        },
-    ];
-
-    const eventsByDate = groupEventsByDate(mockEvents);
+    const eventsByDate = groupEventsByDate(events);
     const days = getDaysInMonthGrid(year, month);
 
     return (
@@ -144,6 +66,24 @@ export default function MonthViewer() {
                     events={getEventsByDate(selectedDate, eventsByDate)}
                     onCreateEvent={handleCreateEvent}
                 />
+            )}
+
+            {showCreateEvent && (
+                <Modal
+                    animationType="slide"
+                    transparent={false}
+                    visible={showCreateEvent}
+                    onRequestClose={() => setShowCreateEvent(false)}
+                >
+                    <CreateEventForm
+                        selectedDate={selectedDate ?? undefined}
+                        onSuccess={() => {
+                            setShowCreateEvent(false);
+                            fetchEvents();
+                        }}
+                        onCancel={() => setShowCreateEvent(false)}
+                    />
+                </Modal>
             )}
         </View>
     );
