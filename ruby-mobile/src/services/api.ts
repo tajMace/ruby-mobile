@@ -11,6 +11,7 @@
  */
 
 import axios from 'axios'
+import { CalendarEvent } from '../models/CalendarEvent';
 
 const API_BASE_URL = 'http://134.199.150.224:3000';
 
@@ -20,18 +21,60 @@ export const api = axios.create({
 });
 
 export const calendarAPI = {
-    // Create
-    createEvent: (data: any) => api.post('/calendar', data),
+    // ----- CREATE -----
+    // create with AI pipeline (from natural language)
+    createEvent: (request: string) => 
+        api.post('/calendar', { request }),
 
-    // Read
-    getAllEvents: () => api.get('/calendar'),
-    getEventById: (id: number) => api.get(`/calendar/${id}`),
+    // create directly (structured data)
+    createEventDirect: (data: Omit<CalendarEvent, 'id' | 'created_at'>) => 
+        api.post('/calendar/direct', data),
+
+    // ----- READ -----
+    getAllEvents: () => 
+        api.get('/calendar'),
     
-    // Update
-    updateEvent: (id: number, data: any) => api.post(`/calendar/${id}`, data),
+    getEventById: (id: number) => 
+        api.get(`/calendar/${id}`),
+    
+    getEventsByDate: (date: string) => 
+        api.get(`/calendar/date/${date}`),
+    
+    getUpcomingEvents: (days: number = 7) => 
+        api.get(`/calendar/upcoming/${days}`),
+    
+    getEventsByDateRange: (startDate: string, endDate: string) => 
+        api.get(`/calendar/range/${startDate}/${endDate}`),
+    
+    getEventsByLabels: (labels: string[]) => 
+        api.post('/calendar/labels/search', { labels }),
+    
+    searchEvents: (query: string) => 
+        api.get(`/calendar/search/${query}`),
+    
+    getRecurringEvents: () => 
+        api.get('/calendar/recurring/all'),
 
-    // Delete
-    deleteEvent: (id: number) => api.delete(`/calendar/${id}`)
+    // ----- UPDATE -----
+    updateEvent: (id: number, updates: Partial<CalendarEvent>) => 
+        api.post(`/calendar/${id}`, updates),
+
+    rescheduleEvent: (id: number, newStartDate: string, newStartTime?: string, newEndTime?: string) => 
+        api.post(`/calendar/${id}/reschedule`, { newStartDate, newStartTime, newEndTime }),
+
+    // ----- DELETE -----
+    deleteEvent: (id: number) => 
+        api.delete('/calendar', { data: { id } }),
+    
+    deleteAllEvents: () => 
+        api.delete('/calendar/all'),
+    
+    deleteEventsByDate: (date: string) => 
+        api.delete(`/calendar/date/${date}`),
+
+    // ----- UTILITY -----
+    checkConflict: (date: string, startTime: string, endTime: string) => 
+        api.post('/calendar/conflict/check', { date, startTime, endTime })
 };
 
 export const ticketAPI = {
