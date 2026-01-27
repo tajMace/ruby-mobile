@@ -10,16 +10,17 @@
  * =============<< ********* >>=============
  */
 
-import { View, Text, StyleSheet, ScrollView } from 'react-native'
+import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native'
 import { CalendarEvent } from '../../models/CalendarEvent'
 import { calendarColors, spacing, typography } from '../../theme'
 
 interface EventViewerProps {
     date: Date;
     events: CalendarEvent[];
+    onCreateEvent?: () => void;
 }
 
-export default function EventViewer({ date, events }: EventViewerProps) {
+export default function EventViewer({ date, events, onCreateEvent }: EventViewerProps) {
     return (
         <ScrollView style={styles.container}>
             {events.length === 0 ? (
@@ -65,6 +66,14 @@ function EventCard({ event }: { event: CalendarEvent }) {
             </View>
         </View>
     );
+}
+
+function CreateEventButton({ onPress }: { onPress?: () => void }) {
+    return (
+        <Pressable onPress={onPress} style={styles.addButton}>
+            <Text style={styles.addButtonText}>Create Event +</Text>
+        </Pressable>
+    )
 }
 
 const styles = StyleSheet.create({
@@ -146,5 +155,21 @@ const styles = StyleSheet.create({
         ...typography.subtitle,
         color: calendarColors.dayNumber,
         opacity: 0.6
+    },
+    addButton: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: calendarColors.background,
+        borderWidth: 1,
+        borderColor: calendarColors.border,
+        borderRadius: 8,
+        padding: spacing.md,
+        marginBottom: spacing.md,
+        gap: spacing.md
+    },
+    addButtonText: {
+        ...typography.h2,
+        color: calendarColors.dayNumber
     }
 });
