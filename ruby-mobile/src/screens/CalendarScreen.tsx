@@ -12,13 +12,13 @@
 
 import { View, StyleSheet } from 'react-native'
 import { calendarColors, spacing } from '../theme'
-import MonthCard from '../components/calendar/MonthView';
+import MonthViewer from '../components/calendar/MonthViewer';
 
 export default function CalendarScreen() {
     return (
         <View style={styles.container}>
             <View style={styles.monthCard}>
-                <MonthCard />
+                <MonthViewer />
             </View>
         </View>
     );

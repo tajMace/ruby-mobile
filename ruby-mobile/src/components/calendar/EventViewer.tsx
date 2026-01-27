@@ -22,9 +22,14 @@ interface EventViewerProps {
 export default function EventViewer({ date, events }: EventViewerProps) {
     return (
         <ScrollView style={styles.container}>
-            {events.map((event) => (
-                <EventCard key={event.id} event={event} />
-            ))}
+            {events.length === 0 ? (
+                <View style={styles.emptyState}>
+                    <Text style={styles.emptyStateText}>no events.</Text>
+                </View>
+            ) : (events.map((event) => (
+                    <EventCard key={event.id} event={event} />
+                ))
+            )}
         </ScrollView>
     );
 }
@@ -130,5 +135,16 @@ const styles = StyleSheet.create({
         paddingVertical: spacing.xs,
         borderRadius: 4,
         marginBottom: spacing.xs
+    },
+    emptyState: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems:'center',
+        minHeight: 150
+    },
+    emptyStateText: {
+        ...typography.subtitle,
+        color: calendarColors.dayNumber,
+        opacity: 0.6
     }
 });
