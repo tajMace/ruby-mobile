@@ -26,6 +26,7 @@ interface MonthCardProps {
     onPrev: () => void;
     onToday: () => void;
     onNext: () => void;
+    onRefresh?: () => void;
 }
 
 export default function MonthCard({
@@ -37,7 +38,8 @@ export default function MonthCard({
     eventsByDate,
     onPrev,
     onToday,
-    onNext
+    onNext,
+    onRefresh
 }: MonthCardProps) {
     const monthName = new Date(year, month, 1).toLocaleString('default', { month: 'long'});
     const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -81,6 +83,10 @@ export default function MonthCard({
 
                 <Pressable onPress={onNext}>
                     <Text style={styles.navButton}>Next →</Text>
+                </Pressable>
+
+                <Pressable onPress={onRefresh}>
+                    <Text style={styles.navButton}>🔄</Text>
                 </Pressable>
             </View>
         </View>

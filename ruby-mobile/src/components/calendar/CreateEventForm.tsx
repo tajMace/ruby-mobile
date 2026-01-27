@@ -88,11 +88,20 @@ export default function CreateEventForm({ onSuccess, onCancel, selectedDate }: C
 
         setIsLoading(true);
         try {
-            await calendarAPI.createEventDirect(formData);
+            console.log('📤 Submitting event:', formData);
+            const response = await calendarAPI.createEventDirect(formData);
+            console.log('✅ Event created:', response);
             setIsLoading(false);
             onSuccess?.();
-        } catch (error) {
-            setError(error instanceof Error ? error.message : 'Failed to create event');
+        } catch (error: any) {
+            console.error('❌ Submit failed:', {
+                message: error.message,
+                status: error.response?.status,
+                url: error.config?.url,
+                data: error.response?.data,
+                requestData: formData
+            });
+            setError(error.response?.data?.error || error.message || 'Failed to create event');
             setIsLoading(false);
         }
     }

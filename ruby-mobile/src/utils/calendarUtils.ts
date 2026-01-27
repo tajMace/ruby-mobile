@@ -19,8 +19,13 @@ import { CalendarEvent } from '../models/CalendarEvent';
 export function groupEventsByDate(events: CalendarEvent[]): Map<string, CalendarEvent[]> {
     const grouped = new Map<string, CalendarEvent[]>();
 
+    if (!events || !Array.isArray(events)) {
+        return grouped;
+    }
+
     events.forEach(event => {
-        const dateKey = event.date.split('T')[0];
+        // Handle both ISO format (2026-01-27T...) and simple date format (2026-01-27)
+        const dateKey = event.date.includes('T') ? event.date.split('T')[0] : event.date;
 
         if (!grouped.has(dateKey)) {
             grouped.set(dateKey, []);
@@ -32,7 +37,11 @@ export function groupEventsByDate(events: CalendarEvent[]): Map<string, Calendar
 }
 
 export function getEventsByDate(date: Date, events: Map<string, CalendarEvent[]>): CalendarEvent[]{
-    return events.get(date.toISOString().split('T')[0]) || [];
+    const year = date.getUTCFullYear();
+    const month = String((date.getUTCMonth() + 1)).padStart(2, '0');
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    const dateKey = `${year}-${month}-${day}`;
+    return events.get(dateKey) || [];
 }
 
 /**
@@ -40,11 +49,12 @@ export function getEventsByDate(date: Date, events: Map<string, CalendarEvent[]>
  * returns array of (date, isCurrentMonth) objects
  */
 export function getDaysInMonthGrid(year: number, month: number): Array<{date: Date, isCurrentMonth: boolean}> {
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
+    // Create dates in UTC to avoid timezone issues
+    const firstDay = new Date(Date.UTC(year, month, 1));
+    const lastDay = new Date(Date.UTC(year, month + 1, 0));
 
     const startDate = new Date(firstDay);
-    startDate.setDate(startDate.getDate() - firstDay.getDay());
+    startDate.setUTCDate(startDate.getUTCDate() - firstDay.getUTCDay());
 
     const days: Array<{date: Date, isCurrentMonth: boolean}> = [];
     const current = new Date(startDate);
@@ -52,9 +62,9 @@ export function getDaysInMonthGrid(year: number, month: number): Array<{date: Da
     for (let i = 0; i < 42; i++) {
         days.push({
             date: new Date(current),
-            isCurrentMonth: current.getMonth() === month
+            isCurrentMonth: current.getUTCMonth() === month
         });
-    current.setDate(current.getDate() + 1);
+        current.setUTCDate(current.getUTCDate() + 1);
     }
 
     return days;
@@ -64,9 +74,9 @@ export function getDaysInMonthGrid(year: number, month: number): Array<{date: Da
  * formats a date to YYYY-MM-DD for consistent comparison
  */
 export function formatDateKey(date: Date): string {
-    const year = date.getFullYear();
-    const month = String((date.getMonth() + 1)).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
+    const year = date.getUTCFullYear();
+    const month = String((date.getUTCMonth() + 1)).padStart(2, '0');
+    const day = String(date.getUTCDate()).padStart(2, '0');
 
     return `${year}-${month}-${day}`;
 }
@@ -76,7 +86,7 @@ export function formatDateKey(date: Date): string {
  */
 export function isToday(date: Date): boolean {
     const today = new Date();
-    return date.getDate() === today.getDate() &&
-           date.getMonth() === today.getMonth() &&
-           date.getFullYear() === today.getFullYear();
+    return date.getUTCDate() === today.getUTCDate() &&
+           date.getUTCMonth() === today.getUTCMonth() &&
+           date.getUTCFullYear() === today.getUTCFullYear();
 }

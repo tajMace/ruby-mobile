@@ -33,9 +33,11 @@ export default function MonthViewer() {
     const fetchEvents = async () => {
         try {
             const response = await calendarAPI.getAllEvents();
-            setEvents(response.data);
-        } catch (error) {
-            console.error('Failed to fetch events:', error);
+            const eventsData = response.data?.events || [];
+            console.log('🔍 Raw events from API:', eventsData.map((e: CalendarEvent) => ({ title: e.event_title, date: e.date })));
+            setEvents(Array.isArray(eventsData) ? eventsData : []);
+        } catch (error: any) {
+            console.error('❌ Fetch failed:', error);
         }
     }
 
@@ -58,6 +60,7 @@ export default function MonthViewer() {
                 onPrev={prev}
                 onToday={toToday}
                 onNext={next}
+                onRefresh={fetchEvents}
             />
 
             {selectedDate && (
