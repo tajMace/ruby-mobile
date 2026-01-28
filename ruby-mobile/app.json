@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "ruby-mobile",
-    "slug": "ruby-mobile",
+    "slug": "ruby",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -14,18 +14,38 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.ruby-mobile"
+      "bundleIdentifier": "com.anonymous.ruby-mobile",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyDAYUSB_OgIXKA3lf87wjPSjWZmux0CY74"
+        }
+      },
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
+      "package": "com.anonymous.rubymobile",
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyDAYUSB_OgIXKA3lf87wjPSjWZmux0CY74"
+        }
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "a9605e8d-3be1-4ed7-8736-7824b087f37d"
+      }
+    },
+    "owner": "ruby-assistant"
   }
 }

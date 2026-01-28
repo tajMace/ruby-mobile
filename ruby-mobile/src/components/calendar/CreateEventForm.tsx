@@ -14,6 +14,7 @@ import { View, Text, TextInput, StyleSheet, Pressable, ScrollView, FlatList } fr
 import { useState, useEffect } from 'react'
 import { calendarColors, spacing, typography } from "../../theme";
 import { calendarAPI } from "../../services/api";
+import { CalendarEvent } from '../../models/CalendarEvent'
 import { formatDateKey } from "../../utils/calendarUtils";
 
 interface EventFormProps {
@@ -30,10 +31,11 @@ interface CreateEventFormProps {
     selectedDate?: Date;
     onSuccess?: () => void;
     onCancel?: () => void;
+    initialEvent?: CalendarEvent; // optional — when present, form acts as edit
 }
 
-export default function CreateEventForm({ onSuccess, onCancel, selectedDate }: CreateEventFormProps) {
-    const [formData, setFormData] = useState<EventFormProps>({
+export default function CreateEventForm({ onSuccess, onCancel, selectedDate, initialEvent }: CreateEventFormProps) {
+    const [formData, setFormData] = useState<EventFormProps>(() => ({
         event_title: '',
         start_time: '',
         end_time: '',
@@ -41,7 +43,22 @@ export default function CreateEventForm({ onSuccess, onCancel, selectedDate }: C
         description: '',
         labels: [],
         date: '', // Initialize date
-    });
+    }));
+
+    // If editing, seed the form
+    useEffect(() => {
+        if (initialEvent) {
+            setFormData({
+                event_title: initialEvent.event_title || '',
+                start_time: initialEvent.start_time || '',
+                end_time: initialEvent.end_time || '',
+                location: initialEvent.location || '',
+                description: initialEvent.description || '',
+                labels: initialEvent.labels || [],
+                date: initialEvent.date || ''
+            })
+        }
+    }, [initialEvent]);
 
     const [labelInput, setLabelInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -53,6 +70,7 @@ export default function CreateEventForm({ onSuccess, onCancel, selectedDate }: C
             handleFieldChange('date', dateString);
         }
     }, [selectedDate]);
+
 
     const handleFieldChange = (field: keyof EventFormProps, value: string) => {
         setFormData(prev => ({
@@ -89,8 +107,13 @@ export default function CreateEventForm({ onSuccess, onCancel, selectedDate }: C
         setIsLoading(true);
         try {
             console.log('📤 Submitting event:', formData);
-            const response = await calendarAPI.createEventDirect(formData);
-            console.log('✅ Event created:', response);
+            if (initialEvent && initialEvent.id) {
+                const response = await calendarAPI.updateEvent(initialEvent.id, formData);
+                console.log('✅ Event updated:', response);
+            } else {
+                const response = await calendarAPI.createEventDirect(formData);
+                console.log('✅ Event created:', response);
+            }
             setIsLoading(false);
             onSuccess?.();
         } catch (error: any) {
@@ -196,7 +219,7 @@ export default function CreateEventForm({ onSuccess, onCancel, selectedDate }: C
 
             <View style={styles.buttonRow}>
                 <Pressable style={styles.submitButton} onPress={handleSubmit} disabled={isLoading}>
-                    <Text style={styles.buttonText}>{isLoading ? 'Creating...' : 'Create Event'}</Text>
+                    <Text style={styles.buttonText}>{isLoading ? (initialEvent ? 'Updating...' : 'Creating...') : (initialEvent ? 'Update Event' : 'Create Event')}</Text>
                 </Pressable>
                 <Pressable style={styles.cancelButton} onPress={onCancel}>
                     <Text style={styles.buttonText}>Cancel</Text>

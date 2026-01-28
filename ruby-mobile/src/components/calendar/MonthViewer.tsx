@@ -68,6 +68,7 @@ export default function MonthViewer() {
                     date={selectedDate}
                     events={getEventsByDate(selectedDate, eventsByDate)}
                     onCreateEvent={handleCreateEvent}
+                    onRefresh={fetchEvents}
                 />
             )}
 

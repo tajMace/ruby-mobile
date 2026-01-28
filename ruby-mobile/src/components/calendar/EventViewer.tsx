@@ -10,24 +10,74 @@
  * =============<< ********* >>=============
  */
 
-import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native'
+import { useState } from 'react'
+import { View, Text, StyleSheet, ScrollView, Pressable, Modal } from 'react-native'
 import { CalendarEvent } from '../../models/CalendarEvent'
+import EventDetailView from './EventDetailView'
+import CreateEventForm from './CreateEventForm'
+import { calendarAPI } from '../../services/api'
 import { calendarColors, spacing, typography } from '../../theme'
 
 interface EventViewerProps {
     date: Date;
     events: CalendarEvent[];
     onCreateEvent?: () => void;
+    onRefresh?: () => void;
 }
 
-export default function EventViewer({ date, events, onCreateEvent }: EventViewerProps) {
+export default function EventViewer({ date, events, onCreateEvent, onRefresh }: EventViewerProps) {
+    const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null)
+    const [showDetail, setShowDetail] = useState(false)
+    const [showEdit, setShowEdit] = useState(false)
+
+    const handleOpenDetail = (event: CalendarEvent) => {
+        setSelectedEvent(event)
+        setShowDetail(true)
+    }
+
+    const handleDelete = async (event?: CalendarEvent) => {
+        if (!event || !event.id) return
+        try {
+            await calendarAPI.deleteEvent(event.id)
+            setShowDetail(false)
+            onRefresh?.()
+        } catch (err) {
+            console.error('Failed to delete event', err)
+        }
+    }
+
     return (
-        <ScrollView style={styles.container}>
-            {events.map((event) => (
-                <EventCard key={event.id} event={event} />
-            ))}
-            <CreateEventButton onPress={onCreateEvent} />
-        </ScrollView>
+        <>
+            <ScrollView style={styles.container}>
+                {events.map((event) => (
+                    <Pressable key={event.id} onPress={() => handleOpenDetail(event)}>
+                        <EventCard event={event} />
+                    </Pressable>
+                ))}
+                <CreateEventButton onPress={onCreateEvent} />
+            </ScrollView>
+
+            {selectedEvent && (
+                <Modal visible={showDetail} animationType="slide" transparent={false} onRequestClose={() => setShowDetail(false)}>
+                    <EventDetailView
+                        event={selectedEvent}
+                        onClose={() => setShowDetail(false)}
+                        onEdit={() => { setShowDetail(false); setShowEdit(true); }}
+                        onDelete={() => handleDelete(selectedEvent)}
+                    />
+                </Modal>
+            )}
+
+            {selectedEvent && (
+                <Modal visible={showEdit} animationType="slide" transparent={false} onRequestClose={() => setShowEdit(false)}>
+                    <CreateEventForm
+                        initialEvent={selectedEvent}
+                        onSuccess={() => { setShowEdit(false); onRefresh?.(); }}
+                        onCancel={() => setShowEdit(false)}
+                    />
+                </Modal>
+            )}
+        </>
     );
 }
 
