@@ -15,10 +15,6 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.anonymous.ruby-mobile",
-      "config": {
-        "googleMaps": {
-          "apiKey": "AIzaSyDAYUSB_OgIXKA3lf87wjPSjWZmux0CY74"
-        }
       },
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
@@ -33,9 +29,6 @@
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "config": {
-        "googleMaps": {
-          "apiKey": "AIzaSyDAYUSB_OgIXKA3lf87wjPSjWZmux0CY74"
-        }
       }
     },
     "web": {
